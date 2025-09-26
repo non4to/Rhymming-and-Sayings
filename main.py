@@ -1,10 +1,11 @@
 import random
+import nltk
+nltk.data.path.append('.venv/nltk_data')
 from nltk.corpus import cmudict, wordnet
 
 #nltk.download('cmudict')
 #nltk.download('punkt')
 #nltk.download('wordnet')
-
 # wordnet doc: https://wordnet.princeton.edu/documentation/wngloss7wn
 # Synset: A set of synonyms that share a common meaning.
 # Hypernym: A more general term that encompasses a broader category in which a specific word belongs. (ex: hyper of dog: animal, mammal, canine)
