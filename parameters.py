@@ -1,0 +1,5 @@
+SCREEN_DATA = {
+    "RESOLUTION" : (400,100),
+    "SCREEN_SIZE" : (400,100),
+    "FPS_CAP" : 60
+}

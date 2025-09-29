@@ -1,5 +1,5 @@
-import random
-import nltk
+import random, nltk, pygame
+import parameters
 nltk.data.path.append('.venv/nltk_data')
 from nltk.corpus import cmudict, wordnet
 
@@ -12,12 +12,29 @@ from nltk.corpus import cmudict, wordnet
 # Hyponym: A more specific term that fall under the category of a broader term (hypernym) (ex: hypo of dog: golden retriver, poodle, pincher)
 
 class MyFirstGrammar():
-
     def __init__(self) -> None:
         self.adjectives, self.nouns, self.adverbs = self.get_adjectives_nouns_adverbs_list()
+        self.poems = ""
         self.colors = self.get_colors_list()
         self.d = cmudict.dict()
-
+        self.initialState = True
+        self.start_game()
+        
+    def start_game(self) -> None:
+        pygame.init()
+        pygame.font.init()
+        self.resolution = parameters.SCREEN_DATA["RESOLUTION"]
+        self.screen_size = parameters.SCREEN_DATA["SCREEN_SIZE"]
+        self.canvas = pygame.Surface(self.resolution)
+        self.screen = pygame.display.set_mode(self.screen_size)
+        self.x_screen_scale = self.resolution[0] / self.screen_size[0]
+        self.y_screen_scale = self.resolution[1] / self.screen_size[1]
+        self.fps_cap = parameters.SCREEN_DATA["FPS_CAP"]
+        pygame.display.set_caption("POEM GENERATOR")        
+        self.exit = False
+        self.clock = pygame.time.Clock()     
+        self.game_loop()   
+        
     def get_phoneme(self, word: str) -> list:
         """input: a word (string)
         output: a list of phonemes of said word, empty list if word doesnt exist"""
@@ -105,17 +122,47 @@ class MyFirstGrammar():
         rhyme1 = self.get_adjective()
         rhyme2 = self.get_word(self.rhyme_options(rhyme1,"b"))
 
-        s1 = f"\n--\nRoses are {self.get_color()}. Violets are {rhyme1}."
-        s2 = f"\n{self.get_noun()} is {self.get_adjective()}, and so is {rhyme2}."
-        s3 = f"\n--\n Never optimize the {self.get_noun()} out of your life."
-        s4 = f"\n--\n Always do things in a {self.get_adverb()} way to people."
-        s5 = f"\n--\n {self.get_adjective()} acts always generates {self.get_adjective()} acts."
-        s6 = f"\n--\n Brace yourselves. {self.get_noun()} is coming."
-        return s1+s2+s3+s4+s5+s6
+        s1 = f"Roses are {self.get_color()}. Violets are {rhyme1}."
+        s2 = f"{self.get_noun()} is {self.get_adjective()}, and so is {rhyme2}."
+        s3 = f"Never optimize the {self.get_noun()} out of your life."
+        s4 = f"Always do things in a {self.get_adverb()} way to people."
+        s5 = f"{self.get_adjective()} acts always generates {self.get_adjective()} acts."
+        s6 = f"Brace yourselves. {self.get_noun()} is coming."
+        return random.choice([s1,s2,s3,s4,s5,s6])
 
-def demo():
-    myGrammar = MyFirstGrammar()
-    print(myGrammar.get_sentence())
-    
+    def game_loop(self) -> None:
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.type == pygame.QUIT:
+                        running = False
+                    if event.key == pygame.K_SPACE:
+                        if self.initialState:
+                            self.initialState = False
+                        self.poems = self.get_sentence()
+                    elif (event.key == pygame.K_q) or (event.key == pygame.K_ESCAPE):
+                        running = False
+            if running:
+                self.canvas.fill((0, 0, 0)) 
+                self.draw()
+                scaled_canvas = pygame.transform.scale(self.canvas, self.screen_size)
+                self.screen.blit(scaled_canvas, (0, 0))  # Draw scaled canvas on the screen
+                pygame.display.update()  # atualiza a tela
+                
+    def draw(self) -> None:
+        if (self.initialState):
+            font = pygame.font.Font(None,20)
+            askSpace = font.render("Press 'SPACE' to get new poems",True, (255,255,255))
+            self.canvas.blit(askSpace,(25,45))
+        else:
+            font = pygame.font.Font(None,20)
+            poems2screen = font.render(self.poems,True, (255,255,255))
+            self.canvas.blit(poems2screen,(25,45))
+
+
+def execute():
+    myGrammarGame = MyFirstGrammar()
+
 if __name__ == "__main__":
-    demo()
+    execute()
