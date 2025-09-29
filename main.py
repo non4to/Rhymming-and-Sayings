@@ -13,10 +13,6 @@ from nltk.corpus import cmudict, wordnet
 
 class MyFirstGrammar():
     def __init__(self) -> None:
-        self.adjectives, self.nouns, self.adverbs = self.get_adjectives_nouns_adverbs_list()
-        self.poems = ""
-        self.colors = self.get_colors_list()
-        self.d = cmudict.dict()
         self.initialState = True
         self.start_game()
         
@@ -33,6 +29,20 @@ class MyFirstGrammar():
         pygame.display.set_caption("POEM GENERATOR")        
         self.exit = False
         self.clock = pygame.time.Clock()     
+        #------
+        font = pygame.font.Font(None,20)
+        askSpace = font.render("Loading...",True, (255,255,255))
+        self.canvas.blit(askSpace,(25,45))
+        self.update_screen()
+        
+        self.adjectives, self.nouns, self.adverbs = self.get_adjectives_nouns_adverbs_list()
+        self.colors = self.get_colors_list()
+        self.d = cmudict.dict()
+        #------
+        self.poems = ""
+        self.author = ""
+        self.borderColor = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+        
         self.game_loop()   
         
     def get_phoneme(self, word: str) -> list:
@@ -141,16 +151,18 @@ class MyFirstGrammar():
                         if self.initialState:
                             self.initialState = False
                         self.poems = self.get_sentence()
+                        self.author = random.choice(parameters.EMOJI_LIST)
+                        self.borderColor = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
                     elif (event.key == pygame.K_q) or (event.key == pygame.K_ESCAPE):
                         running = False
             if running:
                 self.canvas.fill((0, 0, 0)) 
                 self.draw()
-                scaled_canvas = pygame.transform.scale(self.canvas, self.screen_size)
-                self.screen.blit(scaled_canvas, (0, 0))  # Draw scaled canvas on the screen
-                pygame.display.update()  # atualiza a tela
+                self.update_screen()
                 
     def draw(self) -> None:
+        pygame.draw.rect(self.canvas, self.borderColor, pygame.Rect(0,0,self.screen_size[0],self.screen_size[1]),3)
+        
         if (self.initialState):
             font = pygame.font.Font(None,20)
             askSpace = font.render("Press 'SPACE' to get new poems",True, (255,255,255))
@@ -158,8 +170,18 @@ class MyFirstGrammar():
         else:
             font = pygame.font.Font(None,20)
             poems2screen = font.render(self.poems,True, (255,255,255))
+            author2screen = font.render(self.author, True, (125,125,125))
             self.canvas.blit(poems2screen,(25,45))
+            self.canvas.blit(author2screen,(370,75))
 
+        
+        
+            
+    def update_screen(self) -> None:
+        scaled_canvas = pygame.transform.scale(self.canvas, self.screen_size)
+        self.screen.blit(scaled_canvas, (0, 0))  # Draw scaled canvas on the screen
+        pygame.display.update()  # atualiza a tela
+        
 
 def execute():
     myGrammarGame = MyFirstGrammar()
